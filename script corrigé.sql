@@ -1,10 +1,12 @@
 /*==============================================================*/
 /* Nom de SGBD :  MySQL 5.0                                     */
-/* Date de création :  19/07/2023 12:36:50                      */
+/* Date de création :  21/07/2023 12:20:34                      */
 /*==============================================================*/
 
 
 drop table if exists id_personnel;
+
+drop table if exists role;
 
 drop table if exists table_administrateur;
 
@@ -29,12 +31,23 @@ create table id_personnel
 (
    id_personnel         int not null,
    id_administrateur    int,
+   id_fournisseur       int,
    nom                  varchar(254),
    prenom               varchar(254),
    adresse              varchar(254),
    contact              int,
    specialite           varchar(254),
    primary key (id_personnel)
+);
+
+/*==============================================================*/
+/* Table : role                                                 */
+/*==============================================================*/
+create table role
+(
+   id_depense           int,
+   id_role              int,
+   type                 int
 );
 
 /*==============================================================*/
@@ -89,7 +102,7 @@ create table table_depense
 create table table_fourmisseur
 (
    id_fournisseur       int not null,
-   id_montant_paye      int,
+   id_depense           int,
    nom                  varchar(254),
    prenom               varchar(254),
    adresse              varchar(254),
@@ -107,7 +120,6 @@ create table table_fourmisseur
 create table table_mesure
 (
    id__mesure           int not null,
-   id_fournisseur       int,
    id__modele           int,
    id__clients          int,
    id_supadmi           int,
@@ -142,7 +154,7 @@ create table table_modeles_couture
 create table table_payement
 (
    id_montant_paye      int not null,
-   id_depense           int,
+   id__clients          int,
    date_de_depot        datetime,
    reste                int,
    montant_verse        int,
@@ -156,7 +168,7 @@ create table table_payement
 create table table_superadmi
 (
    id_supadmi           int not null,
-   id_depense           int,
+   id_fournisseur       int,
    nom                  varchar(254),
    prenom               varchar(254),
    sexe                 varchar(254),
@@ -170,8 +182,14 @@ create table table_superadmi
 alter table id_personnel add constraint FK_Association_4 foreign key (id_administrateur)
       references table_administrateur (id_administrateur) on delete restrict on update restrict;
 
-alter table table_fourmisseur add constraint FK_Association_6 foreign key (id_montant_paye)
-      references table_payement (id_montant_paye) on delete restrict on update restrict;
+alter table id_personnel add constraint FK_Association_7 foreign key (id_fournisseur)
+      references table_fourmisseur (id_fournisseur) on delete restrict on update restrict;
+
+alter table role add constraint FK_Association_10 foreign key (id_depense)
+      references table_depense (id_depense) on delete restrict on update restrict;
+
+alter table table_fourmisseur add constraint FK_Association_8 foreign key (id_depense)
+      references table_depense (id_depense) on delete restrict on update restrict;
 
 alter table table_mesure add constraint FK_Association_2 foreign key (id__clients)
       references table_clients (id__clients) on delete restrict on update restrict;
@@ -182,12 +200,9 @@ alter table table_mesure add constraint FK_Association_3 foreign key (id__modele
 alter table table_mesure add constraint FK_Association_5 foreign key (id_supadmi)
       references table_superadmi (id_supadmi) on delete restrict on update restrict;
 
-alter table table_mesure add constraint FK_Association_7 foreign key (id_fournisseur)
+alter table table_payement add constraint FK_Association_6 foreign key (id__clients)
+      references table_clients (id__clients) on delete restrict on update restrict;
+
+alter table table_superadmi add constraint FK_Association_9 foreign key (id_fournisseur)
       references table_fourmisseur (id_fournisseur) on delete restrict on update restrict;
-
-alter table table_payement add constraint FK_Association_9 foreign key (id_depense)
-      references table_depense (id_depense) on delete restrict on update restrict;
-
-alter table table_superadmi add constraint FK_Association_8 foreign key (id_depense)
-      references table_depense (id_depense) on delete restrict on update restrict;
 
